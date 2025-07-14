@@ -1,0 +1,26 @@
+services:
+  yyassistant-client:
+    image: "zinohome/yyassistant-client:v0.0.1"
+    container_name: yyassistant-client
+    hostname: yyassistant-client
+    restart: unless-stopped
+    ports:
+      - "8000:8000/tcp"
+    volumes:
+      - "/data/yyasistant-client/.env:/opt/yyasistant-client/.env"
+    networks:
+      - 1panel-network
+  yyassistant-server:
+    image: "zinohome/yyassistant-server:v0.0.1"
+    container_name: yyassistant-server
+    hostname: yyassistant-server
+    restart: unless-stopped
+    #ports:
+    #  - "8880:8880/tcp"
+    volumes:
+      - "/data/yyasistant-server/configs:/opt/yyasistant-server/configs"
+    networks:
+      - 1panel-network
+networks:
+  1panel-network:
+    external: true

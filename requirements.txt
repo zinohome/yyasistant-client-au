@@ -1,0 +1,9 @@
+chainlit
+loguru>=0.7.3
+python-configuration
+httpx>=0.27.2
+numpy<2.0.0
+openai
+yfinance
+plotly
+websockets==14.1
