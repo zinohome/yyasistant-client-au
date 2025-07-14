@@ -1,13 +1,13 @@
 services:
   yyassistant-client:
-    image: "zinohome/yyassistant-client:v0.0.1"
-    container_name: yyassistant-client
-    hostname: yyassistant-client
+    image: "zinohome/yyassistant-client-au:v0.0.1"
+    container_name: yyassistant-client-au
+    hostname: yyassistant-client-au
     restart: unless-stopped
     ports:
       - "8000:8000/tcp"
     volumes:
-      - "/data/yyasistant-client/.env:/opt/yyasistant-client/.env"
+      - "/data/yyasistant-client-au/.env:/opt/yyasistant-client-au/.env"
     networks:
       - 1panel-network
   yyassistant-server:

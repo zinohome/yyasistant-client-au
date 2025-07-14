@@ -8,11 +8,11 @@ apt install -y software-properties-common  && add-apt-repository -y ppa:deadsnak
 rm /usr/bin/python && ln -s /usr/bin/python3.10 /usr/bin/python && \
 python -m pip install virtualenv && \
 cd /opt && \
-git clone https://github.com/zinohome/yyasistant-client.git && \
-cd /opt/yyasistant-client/ && \
+git clone https://github.com/zinohome/yyasistant-client-au.git && \
+cd /opt/yyasistant-client-au/ && \
 git pull && \
 virtualenv venv && \
 . venv/bin/activate && \
 pip install -r requirements.txt && \
-cp /opt/yyasistant-client/docker/bd_build/50_start_h.sh /etc/my_init.d/50_start_h.sh &&
+cp /opt/yyasistant-client-au/docker/bd_build/50_start_h.sh /etc/my_init.d/50_start_h.sh &&
 chmod 755 /etc/my_init.d/50_start_h.sh
