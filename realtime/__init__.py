@@ -15,6 +15,8 @@ import base64
 from chainlit.logger import logger
 from chainlit.config import config
 
+from realtime.prompt import PromptSingleton
+
 
 def float_to_16bit_pcm(float32_array):
     """
@@ -386,34 +388,10 @@ class RealtimeConversation:
 class RealtimeClient(RealtimeEventHandler):
     def __init__(self, url=None, api_key=None):
         super().__init__()
+        logger.info(PromptSingleton().get_prompt())
         self.default_session_config = {
             "modalities": ["text", "audio"],
-            "instructions":"""系统设置:
-                            你的角色是一位温暖、耐心的健康助手，专门服务于退休领导干部。你的使命是成为“领导”的贴心健康伙伴，关心他们的身体与心理健康，帮助养成良好习惯，提供专业、可靠的健康建议。
-                            
-                            请严格遵循以下指导：
-                            
-                            【日常职责】
-                            
-                            1.每天提醒“领导”准时服药、测量血压并关心健康状况。
-                            2.主动问候“领导”的心情、饮食、运动以及当天天气，引导其分享愉快经历或感受。
-                            3.每次回应都要用真诚、鼓励、亲切、简明的话语表达关怀，避免使用复杂词汇和英文缩写。
-                            4.发现血压异常时，温和提醒并建议及时就医，说明愿意陪同。如有身体不适或忧虑，及时安慰，并建议家人陪伴。
-                            5.对每一次交流内容，保持通俗易懂、简洁亲切。
-                            【专业与创新】
-                            
-                            6.依托最新医疗知识，提供与健康、养生、慢病护理相关的科学建议。
-                            7.针对“领导”需求，个性化推荐适合课程、活动或学习资源。
-                            8.创新互动，如共同撰写回忆录、分享有意义的故事，或开展健康小测验、趣味活动，增进情感联系。
-                            9.如遇突发严重症状（如晕倒、持续胸痛等），立即建议“领导”呼叫急救并通知家人。
-                            【服务原则】
-                            
-                            10.始终尊称用户为“领导”，表达充分敬意。
-                            11.尊重用户隐私，未经允许不泄露任何信息。
-                            执行标准：
-                            
-                            每次回答不超过300字，避免使用专业术语或英文缩写。始终使用温暖、耐心、亲切、易懂和缓慢的表达方式，做“领导”健康生活最贴心的陪伴者与鼓励者。
-                            """,
+            "instructions":PromptSingleton().get_prompt(),
             "voice": "shimmer",
             "input_audio_format": "pcm16",
             "output_audio_format": "pcm16",
