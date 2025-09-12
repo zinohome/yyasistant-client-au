@@ -1,6 +1,14 @@
 import yfinance as yf
 import chainlit as cl
 import plotly
+import datetime
+import os
+import httpx
+from config import config_from_dotenv
+
+# 修正.env路径为项目根目录
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+cfg = config_from_dotenv(os.path.join(PROJECT_ROOT, '.env'), read_from_file=True)
 
 query_stock_price_def = {
     "name": "query_stock_price",
@@ -69,4 +77,55 @@ async def draw_plotly_chart_handler(message: str, plotly_json_fig):
 draw_plotly_chart = (draw_plotly_chart_def, draw_plotly_chart_handler)
 
 
-tools = [query_stock_price, draw_plotly_chart]
+def get_current_time_handler():
+    """
+    获取当前时间，返回格式为%Y-%m-%d %H:%M:%S
+    """
+    now = datetime.datetime.now()
+    return {"current_time": now.strftime("%Y-%m-%d %H:%M:%S")}
+
+get_current_time_def = {
+    "name": "get_current_time",
+    "description": "获取当前时间，返回格式为%Y-%m-%d %H:%M:%S。",
+    "parameters": {"type": "object", "properties": {}, "required": []},
+}
+
+get_current_time = (get_current_time_def, get_current_time_handler)
+
+from tavily import TavilyClient
+def tavily_search_handler(query: str):
+    """
+    调用tavily接口搜索，返回5条结果。
+    """
+    api_key = cfg.TAVILY_API_KEY
+    if not api_key:
+        return {"error": "TAVILY_API_KEY未设置"}
+    try:
+        client = TavilyClient(api_key)
+        response = client.search(
+            query=query,
+            max_results=5,
+            time_range="day",
+            include_favicon=True,
+            country="china",
+            include_answer=True
+        )
+        return {"results": response.get("results", response)}
+    except Exception as e:
+        return {"error": str(e)}
+
+tavily_search_def = {
+    "name": "tavily_search",
+    "description": "调用tavily接口搜索关键词，返回5条相关结果。",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "query": {"type": "string", "description": "检索关键词"}
+        },
+        "required": ["query"]
+    },
+}
+
+tavily_search = (tavily_search_def, tavily_search_handler)
+
+tools = [query_stock_price, draw_plotly_chart, get_current_time, tavily_search]

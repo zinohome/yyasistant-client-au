@@ -7,3 +7,4 @@ openai
 yfinance
 plotly
 websockets==14.1
+tavily-python>=0.7.12
