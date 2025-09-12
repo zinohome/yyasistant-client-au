@@ -128,9 +128,6 @@ tavily_search_def = {
 
 tavily_search = (tavily_search_def, tavily_search_handler)
 
-tools = [query_stock_price, draw_plotly_chart, get_current_time, tavily_search]
-
-
 def amap_query_handler(city: str) -> str:
     api_key = cfg.AMAP_MAPS_API_KEY
     if not api_key:
@@ -159,4 +156,7 @@ amap_query_def = {
     },
     "handler": amap_query_handler
 }
-tools.append(amap_query_def)
+
+amap_query_def = (amap_query_def, amap_query_handler)
+#tools = [query_stock_price, draw_plotly_chart, get_current_time, tavily_search, amap_query_def]
+tools = [get_current_time, tavily_search, amap_query_def]
