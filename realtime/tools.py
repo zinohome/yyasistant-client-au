@@ -3,7 +3,7 @@ import chainlit as cl
 import plotly
 import datetime
 import os
-import httpx
+import requests
 from config import config_from_dotenv
 
 # 修正.env路径为项目根目录
@@ -129,3 +129,34 @@ tavily_search_def = {
 tavily_search = (tavily_search_def, tavily_search_handler)
 
 tools = [query_stock_price, draw_plotly_chart, get_current_time, tavily_search]
+
+
+def amap_query_handler(city: str) -> str:
+    api_key = cfg.AMAP_MAPS_API_KEY
+    if not api_key:
+        return "请先配置AMAP_MAPS_API_KEY环境变量。"
+    url = "https://restapi.amap.com/v3/weather/weatherInfo"
+    params = {"key": api_key, "city": city, "extensions": "base"}
+    try:
+        resp = requests.get(url, params=params, timeout=8)
+        data = resp.json()
+        if data.get("status") == "1" and data.get("lives"):
+            weather_data = data["lives"][0]
+            return f"{weather_data['city']}当前天气：{weather_data['weather']}，温度：{weather_data['temperature']}℃，风向：{weather_data['winddirection']}，风力：{weather_data['windpower']}级"
+        else:
+            return "未查到该城市天气信息。"
+    except Exception as e:
+        return f"请求天气接口异常: {e}"
+amap_query_def = {
+    "name": "amap_query",
+    "description": "根据城市名查询该地的实时天气情况（数据来自高德平台）",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {"type": "string", "description": "城市名称（如'北京'）"}
+        },
+        "required": ["city"]
+    },
+    "handler": amap_query_handler
+}
+tools.append(amap_query_def)
