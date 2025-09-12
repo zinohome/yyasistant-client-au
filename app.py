@@ -13,8 +13,6 @@ import io
 import wave
 from uuid import uuid4
 
-import numpy as np
-import audioop
 
 from chainlit.input_widget import Switch
 from config import config_from_dotenv

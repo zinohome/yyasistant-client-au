@@ -1,5 +1,6 @@
-# Derived from https://github.com/openai/openai-realtime-console. Will integrate with Chainlit when more mature.
-
+# Derived from https://github.com/openai/openai-realtime-console.
+# Will integrate with Chainlit when more mature.
+import logging
 import os
 import asyncio
 import inspect
@@ -96,7 +97,7 @@ class RealtimeAPI(RealtimeEventHandler):
     def log(self, *args):
         logger.debug(f"[Websocket/{datetime.utcnow().isoformat()}]", *args)
 
-    async def connect(self, model='gpt-4o-realtime-preview-2024-12-17'):
+    async def connect(self, model='gpt-4o-realtime-preview-2025-06-03'):
         logger.info("Connecting to OpenAI API...")
         ssl_ctx = ssl.create_default_context()
         ssl_ctx.check_hostname = False
@@ -388,7 +389,7 @@ class RealtimeConversation:
 class RealtimeClient(RealtimeEventHandler):
     def __init__(self, url=None, api_key=None):
         super().__init__()
-        logger.info(PromptSingleton().get_prompt())
+        #logger.info(PromptSingleton().get_prompt())
         self.default_session_config = {
             "modalities": ["text", "audio"],
             "instructions":PromptSingleton().get_prompt(),
@@ -414,6 +415,7 @@ class RealtimeClient(RealtimeEventHandler):
         self.conversation = RealtimeConversation()
         self._reset_config()
         self._add_api_event_handlers()
+        logger.info("RealtimeClient initialized")
 
     def _reset_config(self):
         self.session_created = False
