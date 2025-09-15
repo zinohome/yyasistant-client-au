@@ -20,9 +20,15 @@ from config import config_from_dotenv
 from realtime import RealtimeClient
 from realtime.tools import tools
 from utils.logger import logger
+# 在文件顶部添加这行来配置 engineio
+import config_engineio  # 导入 engineio 配置
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 cfg = config_from_dotenv(os.path.join(BASE_DIR, '.env'), read_from_file=True)
 
+# 在文件顶部添加这行来配置 engineio
+import config_engineio  # 导入 engineio 配置
 PROFILE_NAME = "健康助手"
 PROFILE_ICON = "/public/profileimg/XiaoYan2.png"
 PROFILE_DESC = "我是您的健康助手小研，我总是在这里，随时准备帮助您。我能够为您提供多方面、个性化的服务。"
@@ -239,18 +245,38 @@ async def on_audio_start():
 @cl.on_audio_chunk
 async def on_audio_chunk(chunk: cl.InputAudioChunk):
     openai_realtime: RealtimeClient = cl.user_session.get("openai_realtime")
+    #if openai_realtime.is_connected():
+    #    await openai_realtime.append_input_audio(chunk.data)
+    #else:
+    #    logger.info("RealtimeClient is not connected")
     if openai_realtime.is_connected():
-        await openai_realtime.append_input_audio(chunk.data)
+        # 可以考虑添加一个简单的批处理机制
+        audio_buffer = cl.user_session.get("audio_buffer", bytearray())
+        audio_buffer.extend(chunk.data)
+
+        # 当缓冲区达到一定大小时再发送
+        if len(audio_buffer) > 8192:  # 8KB 的阈值，可以根据需要调整
+            await openai_realtime.append_input_audio(audio_buffer)
+            cl.user_session.set("audio_buffer", bytearray())
+        else:
+            cl.user_session.set("audio_buffer", audio_buffer)
     else:
         logger.info("RealtimeClient is not connected")
+
 
 @cl.on_audio_end
 @cl.on_chat_end
 @cl.on_stop
 async def on_end():
+    #openai_realtime: RealtimeClient = cl.user_session.get("openai_realtime")
+    #if openai_realtime and openai_realtime.is_connected():
+    #    await openai_realtime.disconnect()
     openai_realtime: RealtimeClient = cl.user_session.get("openai_realtime")
-    if openai_realtime and openai_realtime.is_connected():
-        await openai_realtime.disconnect()
+    audio_buffer = cl.user_session.get("audio_buffer", bytearray())
+    if openai_realtime.is_connected() and len(audio_buffer) > 0:
+        await openai_realtime.append_input_audio(audio_buffer)
+        cl.user_session.set("audio_buffer", bytearray())
+
 
 if __name__ == "__main__":
     from chainlit.cli import run_chainlit
