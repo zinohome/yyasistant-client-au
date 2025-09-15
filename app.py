@@ -24,8 +24,6 @@ from utils.logger import logger
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 cfg = config_from_dotenv(os.path.join(BASE_DIR, '.env'), read_from_file=True)
 
-# 在文件顶部添加这行来配置 engineio
-import config_engineio  # 导入 engineio 配置
 PROFILE_NAME = "健康助手"
 PROFILE_ICON = "/public/profileimg/XiaoYan2.png"
 PROFILE_DESC = "我是您的健康助手小研，我总是在这里，随时准备帮助您。我能够为您提供多方面、个性化的服务。"
