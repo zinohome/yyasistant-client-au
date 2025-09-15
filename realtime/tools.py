@@ -76,24 +76,33 @@ async def draw_plotly_chart_handler(message: str, plotly_json_fig):
 
 draw_plotly_chart = (draw_plotly_chart_def, draw_plotly_chart_handler)
 
-
-def get_current_time_handler():
+get_current_time_def = {
+    "name": "get_current_time",
+    "description": "获取当前时间，返回格式为%Y-%m-%d %H:%M:%S。",
+    "parameters": {"type": "object", "properties": {}, "required": []},
+}
+async def get_current_time_handler():
     """
     获取当前时间，返回格式为%Y-%m-%d %H:%M:%S
     """
     now = datetime.datetime.now()
     return {"current_time": now.strftime("%Y-%m-%d %H:%M:%S")}
 
-get_current_time_def = {
-    "name": "get_current_time",
-    "description": "获取当前时间，返回格式为%Y-%m-%d %H:%M:%S。",
-    "parameters": {"type": "object", "properties": {}, "required": []},
-}
-
 get_current_time = (get_current_time_def, get_current_time_handler)
 
 from tavily import TavilyClient
-def tavily_search_handler(query: str):
+tavily_search_def = {
+    "name": "tavily_search",
+    "description": "调用tavily接口搜索关键词，返回5条相关结果。",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "query": {"type": "string", "description": "检索关键词"}
+        },
+        "required": ["query"]
+    },
+}
+async def tavily_search_handler(query: str):
     """
     调用tavily接口搜索，返回5条结果。
     """
@@ -114,21 +123,21 @@ def tavily_search_handler(query: str):
     except Exception as e:
         return {"error": str(e)}
 
-tavily_search_def = {
-    "name": "tavily_search",
-    "description": "调用tavily接口搜索关键词，返回5条相关结果。",
+tavily_search = (tavily_search_def, tavily_search_handler)
+
+amap_query_def = {
+    "name": "amap_query",
+    "description": "根据城市名查询该地的实时天气情况（数据来自高德平台）",
     "parameters": {
         "type": "object",
         "properties": {
-            "query": {"type": "string", "description": "检索关键词"}
+            "city": {"type": "string", "description": "城市名称（如'北京'）"}
         },
-        "required": ["query"]
-    },
+        "required": ["city"]
+    }
 }
 
-tavily_search = (tavily_search_def, tavily_search_handler)
-
-def amap_query_handler(city: str) -> str:
+async def amap_query_handler(city: str) -> str:
     api_key = cfg.AMAP_MAPS_API_KEY
     if not api_key:
         return "请先配置AMAP_MAPS_API_KEY环境变量。"
@@ -144,18 +153,7 @@ def amap_query_handler(city: str) -> str:
             return "未查到该城市天气信息。"
     except Exception as e:
         return f"请求天气接口异常: {e}"
-amap_query_def = {
-    "name": "amap_query",
-    "description": "根据城市名查询该地的实时天气情况（数据来自高德平台）",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "city": {"type": "string", "description": "城市名称（如'北京'）"}
-        },
-        "required": ["city"]
-    },
-    "handler": amap_query_handler
-}
+
 
 amap_query = (amap_query_def, amap_query_handler)
 #tools = [query_stock_price, draw_plotly_chart, get_current_time, tavily_search, amap_query]

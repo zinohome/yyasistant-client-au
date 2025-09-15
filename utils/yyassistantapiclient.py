@@ -306,6 +306,7 @@ class YYAssistantAPIClient:
 
     async def create_agent_conversation(self, engine, data, user_id="tester", request_id="", cookie=""):
         url = f"{self.base_url}/yyh/agent/v0/engine/{engine}"
+        logger.info(f"Create Agent Conversation Request: {url}")
         headers = {
             "User-Id": user_id,
             "Request-Id": request_id,
